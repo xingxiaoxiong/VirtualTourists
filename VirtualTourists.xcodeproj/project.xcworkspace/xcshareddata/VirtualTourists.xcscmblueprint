@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "F934F9AD08D55A18B59DD510004BCF7B890F280C",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "5E32233CC4B3D004BDE8903D03F6C0AFCAF27AFC" : 0,
+    "F934F9AD08D55A18B59DD510004BCF7B890F280C" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "B86DAA79-5D8B-46C6-8B39-CAA7F5D5E881",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "5E32233CC4B3D004BDE8903D03F6C0AFCAF27AFC" : "ios-persistence-2.0\/",
+    "F934F9AD08D55A18B59DD510004BCF7B890F280C" : "VirtualTourists\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "VirtualTourists",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "VirtualTourists.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/udacity\/ios-persistence-2.0",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "5E32233CC4B3D004BDE8903D03F6C0AFCAF27AFC"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/xingxiaoxiong\/VirtualTourists.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "F934F9AD08D55A18B59DD510004BCF7B890F280C"
+    }
+  ]
+}
