@@ -18,8 +18,11 @@ class MapViewController: UIViewController {
         super.viewDidLoad()
         
         mapView.delegate = self
-        
         restoreMapRegion(false)
+        
+        let uilgr = UILongPressGestureRecognizer(target: self, action: "addAnnotation:")
+        uilgr.minimumPressDuration = 2.0
+        mapView.addGestureRecognizer (uilgr)
     }
     
     var filePath : String {
@@ -54,11 +57,20 @@ class MapViewController: UIViewController {
             
             let savedRegion = MKCoordinateRegion(center: center, span: span)
             
-            print("lat: \(latitude), lon: \(longitude), latD: \(latitudeDelta), lonD: \(longitudeDelta)")
-            
             mapView.setRegion(savedRegion, animated: animated)
         }
     }
+    
+    func addAnnotation(gestureRecognizer:UIGestureRecognizer){
+        if gestureRecognizer.state == UIGestureRecognizerState.Began {
+            let touchPoint = gestureRecognizer.locationInView(mapView)
+            let newCoordinates = mapView.convertPoint(touchPoint, toCoordinateFromView: mapView)
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = newCoordinates
+            mapView.addAnnotation(annotation)
+        }
+    }
+
 
 }
 
