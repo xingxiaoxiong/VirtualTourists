@@ -8,11 +8,13 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 class MapViewController: UIViewController {
 
     @IBOutlet weak var mapView: MKMapView!
     
+    var pins = [Pin]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,6 +25,9 @@ class MapViewController: UIViewController {
         let uilgr = UILongPressGestureRecognizer(target: self, action: "addAnnotation:")
         uilgr.minimumPressDuration = 2.0
         mapView.addGestureRecognizer (uilgr)
+        
+        pins = fetchAllPins()
+        addAllPins()
     }
     
     var filePath : String {
@@ -68,11 +73,60 @@ class MapViewController: UIViewController {
             let annotation = MKPointAnnotation()
             annotation.coordinate = newCoordinates
             mapView.addAnnotation(annotation)
+            
+            let dictionary: [String : AnyObject] = [
+                Pin.Keys.Latitude : newCoordinates.latitude,
+                Pin.Keys.Longitude : newCoordinates.longitude,
+            ]
+            let pinToBeAdded = Pin(dictionary: dictionary, context: sharedContext)
+            self.pins.append(pinToBeAdded)
+            CoreDataStackManager.sharedInstance().saveContext()
         }
+    }
+    
+    var sharedContext: NSManagedObjectContext {
+        return CoreDataStackManager.sharedInstance().managedObjectContext
+    }
+    
+    func fetchAllPins() -> [Pin] {
+        
+        // Create the Fetch Request
+        let fetchRequest = NSFetchRequest(entityName: "Pin")
+        
+        // Execute the Fetch Request
+        do {
+            return try sharedContext.executeFetchRequest(fetchRequest) as! [Pin]
+        } catch  let error as NSError {
+            print("Error in fetchAllPins(): \(error)")
+            return [Pin]()
+        }
+    }
+    
+    func addAllPins() {
+        var annotations = [MKPointAnnotation]()
+        
+        for pin in pins {
+            
+            let lat = CLLocationDegrees(pin.latitude)
+            let long = CLLocationDegrees(pin.longitude)
+            
+            let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: long)
+            
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = coordinate
+            
+            annotations.append(annotation)
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), {
+            //self.mapView.removeAnnotations(self.mapView.annotations)
+            self.mapView.addAnnotations(annotations)
+        })
     }
 
 
 }
+
 
 extension MapViewController : MKMapViewDelegate {
     
