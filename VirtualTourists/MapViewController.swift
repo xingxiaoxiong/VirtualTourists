@@ -139,9 +139,12 @@ extension MapViewController : MKMapViewDelegate {
         storyboard!.instantiateViewControllerWithIdentifier("PhotoViewController")
             as! PhotoViewController
         
-        //let actor = fetchedResultsController.objectAtIndexPath(indexPath) as! Person
-        
-        //controller.actor = actor
+        for pin in pins {
+            if view.annotation?.coordinate.longitude == pin.longitude && view.annotation?.coordinate.latitude == pin.latitude {
+                controller.pin = pin
+                break
+            }
+        }
         
         self.navigationController!.pushViewController(controller, animated: true)
     }
