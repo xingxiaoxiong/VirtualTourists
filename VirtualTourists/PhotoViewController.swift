@@ -20,6 +20,8 @@ class PhotoViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        setMapRegion(false)
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -110,6 +112,35 @@ class PhotoViewController: UIViewController {
     
     
     func configureCell(cell: PhotoCell, atIndexPath indexPath: NSIndexPath) {
+        
+    }
+    
+    var filePath : String {
+        let manager = NSFileManager.defaultManager()
+        let url = manager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first! as NSURL
+        return url.URLByAppendingPathComponent(MapRegionKey).path!
+    }
+    
+    func setMapRegion(animated: Bool) {
+        
+        if let regionDictionary = NSKeyedUnarchiver.unarchiveObjectWithFile(filePath) as? [String : AnyObject] {
+            
+            let longitude = regionDictionary["longitude"] as! CLLocationDegrees
+            let latitude = regionDictionary["latitude"] as! CLLocationDegrees
+            let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            
+            let longitudeDelta = regionDictionary["latitudeDelta"] as! CLLocationDegrees
+            let latitudeDelta = regionDictionary["longitudeDelta"] as! CLLocationDegrees
+            let span = MKCoordinateSpan(latitudeDelta: latitudeDelta, longitudeDelta: longitudeDelta)
+            
+            let savedRegion = MKCoordinateRegion(center: center, span: span)
+            
+            mapView.setRegion(savedRegion, animated: animated)
+            
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = center
+            mapView.addAnnotation(annotation)
+        }
         
     }
 

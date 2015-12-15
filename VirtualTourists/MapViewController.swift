@@ -10,6 +10,8 @@ import UIKit
 import MapKit
 import CoreData
 
+let MapRegionKey = "mapRegionArchive"
+
 class MapViewController: UIViewController {
 
     @IBOutlet weak var mapView: MKMapView!
@@ -33,7 +35,7 @@ class MapViewController: UIViewController {
     var filePath : String {
         let manager = NSFileManager.defaultManager()
         let url = manager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first! as NSURL
-        return url.URLByAppendingPathComponent("mapRegionArchive").path!
+        return url.URLByAppendingPathComponent(MapRegionKey).path!
     }
 
     func saveMapRegion() {
