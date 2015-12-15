@@ -17,7 +17,7 @@ extension Flickr {
             "safe_search": Flickr.Constants.SAFE_SEARCH,
             "extras": Flickr.Constants.EXTRAS,
             "format": Flickr.Constants.DATA_FORMAT,
-            "per_page": "10"
+            "per_page": "12"
         ]
         
         Flickr.sharedInstance().taskForResource(parameters, completionHandler: { (parsedResult, error) -> Void in

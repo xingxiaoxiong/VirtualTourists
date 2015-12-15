@@ -118,6 +118,10 @@ class PhotoViewController: UIViewController {
 
 extension PhotoViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     
+    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+        return CGSize(width: collectionView.frame.size.width/3 - 5, height: collectionView.frame.size.width/3 - 2.5)
+    }
+    
     func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
         return 1
     }
