@@ -26,7 +26,7 @@ class PhotoViewController: UIViewController {
         super.viewWillAppear(animated)
         
         if pin.photos.isEmpty {
-            
+                        
             Flickr.sharedInstance().getPhotoUrls(pin.latitude as Double, longitude: pin.longitude as Double, completionHandler: { (parsedResult, error) -> Void in
                 
                 if let error = error {
@@ -76,7 +76,7 @@ class PhotoViewController: UIViewController {
                         self.saveContext()
                         
                     } else {
-                        // no images found
+                        
                     }
                     
                 }
@@ -128,12 +128,6 @@ extension PhotoViewController: UICollectionViewDelegate, UICollectionViewDataSou
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         
-//        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("PhotoCell", forIndexPath: indexPath) as! PhotoCell
-//        
-//        self.configureCell(cell, atIndexPath: indexPath)
-//        
-//        return cell
-        
         let photo = pin.photos[indexPath.row]
         let CellIdentifier = "PhotoCell"
         var photoImage = UIImage(named: "photoPlaceHolder")
@@ -150,7 +144,7 @@ extension PhotoViewController: UICollectionViewDelegate, UICollectionViewDataSou
             let task = Flickr.sharedInstance().taskForImage(photo.path) { data, error in
                 
                 if let error = error {
-                    print("Poster download error: \(error.localizedDescription)")
+                    self.alertViewForError(error)
                 }
                 
                 if let data = data {
