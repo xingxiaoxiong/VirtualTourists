@@ -35,7 +35,6 @@ class PhotoViewController: UIViewController {
     
     func downloadPhotos() {
         newCollectionButton.enabled = false
-        downloadingCount = Int(Flickr.Constants.PhotosPerPage)!
         
         Flickr.sharedInstance().getPhotoUrls(pin.latitude as Double, longitude: pin.longitude as Double, completionHandler: { (parsedResult, error) -> Void in
             
@@ -67,6 +66,8 @@ class PhotoViewController: UIViewController {
                     return
                 }
                 
+                self.downloadingCount = photos.count
+                
                 if totalPhotosVal > 0 {
                     
                     _ = photos.map() { (dictionary: [String : AnyObject]) -> Photo in
@@ -86,6 +87,9 @@ class PhotoViewController: UIViewController {
                     self.saveContext()
                     
                 } else {
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.newCollectionButton.setTitle("No Images", forState: UIControlState.Normal)
+                    }
                     
                 }
                 
