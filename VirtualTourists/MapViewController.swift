@@ -121,7 +121,6 @@ class MapViewController: UIViewController {
         }
         
         dispatch_async(dispatch_get_main_queue(), {
-            //self.mapView.removeAnnotations(self.mapView.annotations)
             self.mapView.addAnnotations(annotations)
         })
     }

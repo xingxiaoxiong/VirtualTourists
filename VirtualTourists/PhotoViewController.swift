@@ -13,6 +13,7 @@ import CoreData
 class PhotoViewController: UIViewController {
     
     var pin: Pin!
+    var downloadingCount = 0
 
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var collectionView: UICollectionView!
@@ -28,65 +29,70 @@ class PhotoViewController: UIViewController {
         super.viewWillAppear(animated)
         
         if pin.photos.isEmpty {
-                        
-            Flickr.sharedInstance().getPhotoUrls(pin.latitude as Double, longitude: pin.longitude as Double, completionHandler: { (parsedResult, error) -> Void in
+            downloadPhotos()
+        }
+    }
+    
+    func downloadPhotos() {
+        newCollectionButton.enabled = false
+        downloadingCount = Int(Flickr.Constants.PhotosPerPage)!
+        
+        Flickr.sharedInstance().getPhotoUrls(pin.latitude as Double, longitude: pin.longitude as Double, completionHandler: { (parsedResult, error) -> Void in
+            
+            if let error = error {
+                self.alertViewForError(error)
+            } else {
                 
-                if let error = error {
+                guard let stat = parsedResult["stat"] as? String where stat == "ok" else {
+                    let error = NSError(domain: "Flickr API returned an error. See error code and message in \(parsedResult)", code: 0, userInfo: nil)
                     self.alertViewForError(error)
+                    return
+                }
+                
+                guard let photosDictionary = parsedResult["photos"] as? NSDictionary else {
+                    let error = NSError(domain: "Cannot find keys 'photos' in \(parsedResult)", code: 0, userInfo: nil)
+                    self.alertViewForError(error)
+                    return
+                }
+                
+                guard let totalPhotosVal = (photosDictionary["total"] as? NSString)?.integerValue else {
+                    let error = NSError(domain: "Cannot find key 'total' in \(photosDictionary)", code: 0, userInfo: nil)
+                    self.alertViewForError(error)
+                    return
+                }
+                
+                guard let photos = photosDictionary["photo"] as? [[String: AnyObject]] else {
+                    let error = NSError(domain: "Cannot find key 'photo' in \(photosDictionary)", code: 0, userInfo: nil)
+                    self.alertViewForError(error)
+                    return
+                }
+                
+                if totalPhotosVal > 0 {
+                    
+                    _ = photos.map() { (dictionary: [String : AnyObject]) -> Photo in
+                        let dic: [String : AnyObject] = ["path": dictionary["url_m"]!]
+                        let photo = Photo(dictionary: dic, context: self.sharedContext)
+                        
+                        photo.pin = self.pin
+                        
+                        return photo
+                    }
+                    
+                    dispatch_async(dispatch_get_main_queue()) {
+                        //self.newCollectionButton.enabled = true
+                        self.collectionView.reloadData()
+                    }
+                    
+                    self.saveContext()
+                    
                 } else {
-                    
-                    guard let stat = parsedResult["stat"] as? String where stat == "ok" else {
-                        let error = NSError(domain: "Flickr API returned an error. See error code and message in \(parsedResult)", code: 0, userInfo: nil)
-                        self.alertViewForError(error)
-                        return
-                    }
-                    
-                    guard let photosDictionary = parsedResult["photos"] as? NSDictionary else {
-                        let error = NSError(domain: "Cannot find keys 'photos' in \(parsedResult)", code: 0, userInfo: nil)
-                        self.alertViewForError(error)
-                        return
-                    }
-                    
-                    guard let totalPhotosVal = (photosDictionary["total"] as? NSString)?.integerValue else {
-                        let error = NSError(domain: "Cannot find key 'total' in \(photosDictionary)", code: 0, userInfo: nil)
-                        self.alertViewForError(error)
-                        return
-                    }
-                    
-                    guard let photos = photosDictionary["photo"] as? [[String: AnyObject]] else {
-                        let error = NSError(domain: "Cannot find key 'photo' in \(photosDictionary)", code: 0, userInfo: nil)
-                        self.alertViewForError(error)
-                        return
-                    }
-                    
-                    if totalPhotosVal > 0 {
-                        
-                        _ = photos.map() { (dictionary: [String : AnyObject]) -> Photo in
-                            let dic: [String : AnyObject] = ["path": dictionary["url_m"]!]
-                            let photo = Photo(dictionary: dic, context: self.sharedContext)
-                            
-                            photo.pin = self.pin
-                            //self.pin.photos.append(photo)
-                            
-                            return photo
-                        }
-                        
-                        dispatch_async(dispatch_get_main_queue()) {
-                            self.collectionView.reloadData()
-                        }
-                        
-                        self.saveContext()
-                        
-                    } else {
-                        
-                    }
                     
                 }
                 
-            })
+            }
             
-            
-        }
+        })
+
     }
     
     // MARK: - Core Data Convenience
@@ -101,7 +107,12 @@ class PhotoViewController: UIViewController {
 
 
     @IBAction func newCollectionButtonTapped(sender: UIButton) {
-        
+        for photo in pin.photos {
+            photo.photo = nil
+            sharedContext.deleteObject(photo)
+        }
+        CoreDataStackManager.sharedInstance().saveContext()
+        downloadPhotos()
     }
     
     func alertViewForError(error: NSError) {
@@ -146,7 +157,6 @@ class PhotoViewController: UIViewController {
 
 }
 
-
 extension PhotoViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
@@ -189,6 +199,10 @@ extension PhotoViewController: UICollectionViewDelegate, UICollectionViewDataSou
                     
                     dispatch_async(dispatch_get_main_queue()) {
                         cell.photo.image = image
+                        self.downloadingCount--
+                        if self.downloadingCount == 0 {
+                            self.newCollectionButton.enabled = true
+                        }
                     }
                 }
             }
@@ -202,7 +216,11 @@ extension PhotoViewController: UICollectionViewDelegate, UICollectionViewDataSou
     }
     
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        
+        let photo = pin.photos[indexPath.row]
+        photo.photo = nil
+        sharedContext.deleteObject(photo)
+        CoreDataStackManager.sharedInstance().saveContext()
+        self.collectionView.reloadData()
     }
 
     

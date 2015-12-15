@@ -28,6 +28,8 @@ extension Flickr {
         static let EXTRAS = "url_m"
         static let SAFE_SEARCH = "1"
         static let DATA_FORMAT = "json"
+        
+        static let PhotosPerPage = "12"
     }
     
     struct Keys {
