@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		518ECDCC1C1FACE40015BC88 /* PhotoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518ECDCB1C1FACE40015BC88 /* PhotoCell.swift */; };
 		51C25DFC1C1ECFA0004557E9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C25DFB1C1ECFA0004557E9 /* AppDelegate.swift */; };
 		51C25DFE1C1ECFA0004557E9 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C25DFD1C1ECFA0004557E9 /* MapViewController.swift */; };
 		51C25E011C1ECFA0004557E9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 51C25DFF1C1ECFA0004557E9 /* Main.storyboard */; };
@@ -23,6 +24,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		518ECDCB1C1FACE40015BC88 /* PhotoCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PhotoCell.swift; path = ../PhotoCell.swift; sourceTree = "<group>"; };
 		51C25DF81C1ECFA0004557E9 /* VirtualTourists.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VirtualTourists.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		51C25DFB1C1ECFA0004557E9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		51C25DFD1C1ECFA0004557E9 /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
@@ -86,6 +88,7 @@
 		51C25E0F1C1ED23C004557E9 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				518ECDCB1C1FACE40015BC88 /* PhotoCell.swift */,
 				51C25E111C1EE192004557E9 /* PhotoViewController.swift */,
 				51C25DFD1C1ECFA0004557E9 /* MapViewController.swift */,
 			);
@@ -190,6 +193,7 @@
 				51C25E1A1C1EE6AB004557E9 /* ImageCache.swift in Sources */,
 				51C25DFE1C1ECFA0004557E9 /* MapViewController.swift in Sources */,
 				51C25E141C1EE438004557E9 /* CoreDataStackManager.swift in Sources */,
+				518ECDCC1C1FACE40015BC88 /* PhotoCell.swift in Sources */,
 				51C25E171C1EE491004557E9 /* Model.xcdatamodeld in Sources */,
 				51C25DFC1C1ECFA0004557E9 /* AppDelegate.swift in Sources */,
 				51C25E121C1EE192004557E9 /* PhotoViewController.swift in Sources */,
