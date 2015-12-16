@@ -104,6 +104,9 @@
 			children = (
 				516DF3A51C2163F200675FCE /* CoreDataStackManager.swift */,
 				51C25E151C1EE491004557E9 /* Model.xcdatamodeld */,
+				516DF3A61C2163F200675FCE /* ImageCache.swift */,
+				51C25E1B1C1EE7D9004557E9 /* Pin.swift */,
+				51C25E1D1C1EE859004557E9 /* Photo.swift */,
 				51C25E181C1EE4A6004557E9 /* Flickr */,
 			);
 			name = Model;
@@ -112,9 +115,6 @@
 		51C25E181C1EE4A6004557E9 /* Flickr */ = {
 			isa = PBXGroup;
 			children = (
-				516DF3A61C2163F200675FCE /* ImageCache.swift */,
-				51C25E1B1C1EE7D9004557E9 /* Pin.swift */,
-				51C25E1D1C1EE859004557E9 /* Photo.swift */,
 				51C25E1F1C1EEAF9004557E9 /* Flickr.swift */,
 				518ECDCD1C1FC6760015BC88 /* FlickrConstants.swift */,
 				518ECDCF1C1FEBD50015BC88 /* FlickrConvenience.swift */,

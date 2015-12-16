@@ -14,7 +14,6 @@ class PhotoViewController: UIViewController {
     
     var pin: Pin!
     var downloadingCount = 0
-    var photoCount = 0
 
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var collectionView: UICollectionView!
@@ -28,8 +27,6 @@ class PhotoViewController: UIViewController {
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
-        photoCount = pin.photos.count
         
         if pin.photos.isEmpty {
             downloadPhotos()
@@ -70,7 +67,6 @@ class PhotoViewController: UIViewController {
                 }
                                 
                 self.downloadingCount = photos.count
-                self.photoCount = photos.count
                 
                 if totalPhotosVal > 0 {
                     
@@ -131,11 +127,6 @@ class PhotoViewController: UIViewController {
         self.presentViewController(alert, animated: true, completion: nil)
     }
     
-    
-    func configureCell(cell: PhotoCell, atIndexPath indexPath: NSIndexPath) {
-        
-    }
-    
     var filePath : String {
         let manager = NSFileManager.defaultManager()
         let url = manager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first! as NSURL
@@ -178,8 +169,7 @@ extension PhotoViewController: UICollectionViewDelegate, UICollectionViewDataSou
     }
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        //return self.pin.photos.count
-        return self.photoCount
+        return self.pin.photos.count
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
@@ -236,7 +226,6 @@ extension PhotoViewController: UICollectionViewDelegate, UICollectionViewDataSou
         photo.photo = nil
         sharedContext.deleteObject(photo)
         CoreDataStackManager.sharedInstance().saveContext()
-        self.photoCount = pin.photos.count
         self.collectionView.reloadData()
     }
 
