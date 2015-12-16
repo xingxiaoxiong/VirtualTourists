@@ -202,7 +202,9 @@ extension PhotoViewController: UICollectionViewDelegate, UICollectionViewDataSou
                 let task = Flickr.sharedInstance().taskForImage(photo.path) { data, error in
                     
                     if let error = error {
-                        self.alertViewForError(error)
+                        dispatch_async(dispatch_get_main_queue()) {
+                            self.alertViewForError(error)
+                        }
                     }
                     
                     if let data = data {
