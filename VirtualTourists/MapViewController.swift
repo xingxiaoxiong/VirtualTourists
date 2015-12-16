@@ -85,14 +85,14 @@ class MapViewController: UIViewController {
             
             CoreDataStackManager.sharedInstance().saveContext()
             
-            self.downloadPhotos(newCoordinates.latitude, longitude: newCoordinates.longitude, pin: pinToBeAdded)
+            //self.downloadPhotos(newCoordinates.latitude, longitude: newCoordinates.longitude, pin: pinToBeAdded)
             
         }
     }
     
     func downloadPhotos(latitude: Double, longitude: Double, pin: Pin) {
         
-        Flickr.sharedInstance().getPhotoUrls(latitude, longitude: longitude, completionHandler: { (parsedResult, error) -> Void in
+        Flickr.sharedInstance().getPhotoUrls(latitude, longitude: longitude, completionHandler: { [unowned self] (parsedResult, error) -> Void in
             
             if let error = error {
                 dispatch_async(dispatch_get_main_queue()) {
@@ -134,6 +134,7 @@ class MapViewController: UIViewController {
                 
                 if totalPhotosVal > 0 {
                     
+                    dispatch_async(dispatch_get_main_queue()) {
                     _ = photos.map() { (dictionary: [String : AnyObject]) -> Photo in
                         let dic: [String : AnyObject] = [
                             "path": dictionary["url_m"]!,
@@ -158,6 +159,7 @@ class MapViewController: UIViewController {
                         photo.pin = pin
                         
                         return photo
+                    }
                     }
                     
                     dispatch_async(dispatch_get_main_queue()) {

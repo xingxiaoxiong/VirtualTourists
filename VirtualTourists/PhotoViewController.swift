@@ -28,7 +28,14 @@ class PhotoViewController: UIViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        if pin.photos.isEmpty {
+        downloadingCount = pin.photos.count
+        for photo in pin.photos {
+            if photo.photo != nil {
+                downloadingCount--
+            }
+        }
+        
+        if downloadingCount > 0 || pin.photos.count == 0{
             downloadPhotos()
         }
     }
@@ -80,16 +87,24 @@ class PhotoViewController: UIViewController {
                 
                 if totalPhotosVal > 0 {
                     
-                    _ = photos.map() { (dictionary: [String : AnyObject]) -> Photo in
-                        let dic: [String : AnyObject] = [
-                            "path": dictionary["url_m"]!,
-                            "id": dictionary["id"]!
-                        ]
-                        let photo = Photo(dictionary: dic, context: self.sharedContext)
+                    dispatch_async(dispatch_get_main_queue()) {
                         
-                        photo.pin = self.pin
-                        
-                        return photo
+                        _ = photos.map() { (dictionary: [String : AnyObject]) -> Photo in
+                            let dic: [String : AnyObject] = [
+                                "path": dictionary["url_m"]!,
+                                "id": dictionary["id"]!
+                            ]
+                            
+                            let photo = Photo(dictionary: dic, context: self.sharedContext)
+                            
+                            if photo.photo != nil {
+                                self.downloadingCount--
+                            }
+                            
+                            photo.pin = self.pin
+                            
+                            return photo
+                        }
                     }
                     
                     dispatch_async(dispatch_get_main_queue()) {
@@ -210,18 +225,18 @@ extension PhotoViewController: UICollectionViewDelegate, UICollectionViewDataSou
                     if let data = data {
                         let image = UIImage(data: data)
                         
-                        photo.photo = image
-                        
                         dispatch_async(dispatch_get_main_queue()) {
+                            photo.photo = image
                             cell.photo.image = image
                             self.downloadingCount--
+                            print(self.downloadingCount)
                             if self.downloadingCount == 0 {
                                 self.newCollectionButton.enabled = true
                             }
                         }
                     }
                 }
-                cell.taskToCancelifCellIsReused = task
+                //cell.taskToCancelifCellIsReused = task
             //}
             
         }
