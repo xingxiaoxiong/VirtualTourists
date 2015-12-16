@@ -66,6 +66,8 @@ class PhotoViewController: UIViewController {
                     return
                 }
                 
+                print(photos)
+                
                 self.downloadingCount = photos.count
                 
                 if totalPhotosVal > 0 {
@@ -80,7 +82,6 @@ class PhotoViewController: UIViewController {
                     }
                     
                     dispatch_async(dispatch_get_main_queue()) {
-                        //self.newCollectionButton.enabled = true
                         self.collectionView.reloadData()
                     }
                     
