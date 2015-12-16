@@ -142,19 +142,19 @@ class MapViewController: UIViewController {
                         ]
                         let photo = Photo(dictionary: dic, context: self.sharedContext)
                         
-//                        Flickr.sharedInstance().taskForImage(photo.path) { data, error in
-//                            
-//                            if let error = error {
-//                                dispatch_async(dispatch_get_main_queue()) {
-//                                    self.alertViewForError(error)
-//                                }
-//                            }
-//                            
-//                            if let data = data {
-//                                let image = UIImage(data: data)
-//                                photo.photo = image
-//                            }
-//                        }
+                        Flickr.sharedInstance().taskForImage(photo.path) { data, error in
+                            
+                            if let error = error {
+                                dispatch_async(dispatch_get_main_queue()) {
+                                    self.alertViewForError(error)
+                                }
+                            }
+                            
+                            if let data = data {
+                                let image = UIImage(data: data)
+                                photo.photo = image
+                            }
+                        }
                         
                         photo.pin = pin
                         
