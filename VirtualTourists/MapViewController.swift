@@ -82,12 +82,108 @@ class MapViewController: UIViewController {
             ]
             let pinToBeAdded = Pin(dictionary: dictionary, context: sharedContext)
             self.pins.append(pinToBeAdded)
+            
             CoreDataStackManager.sharedInstance().saveContext()
+            
+            self.downloadPhotos(newCoordinates.latitude, longitude: newCoordinates.longitude, pin: pinToBeAdded)
+            
         }
+    }
+    
+    func downloadPhotos(latitude: Double, longitude: Double, pin: Pin) {
+        
+        Flickr.sharedInstance().getPhotoUrls(latitude, longitude: longitude, completionHandler: { (parsedResult, error) -> Void in
+            
+            if let error = error {
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.alertViewForError(error)
+                }
+            } else {
+                
+                guard let stat = parsedResult["stat"] as? String where stat == "ok" else {
+                    let error = NSError(domain: "Flickr API returned an error.", code: 0, userInfo: nil)
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.alertViewForError(error)
+                    }
+                    return
+                }
+                
+                guard let photosDictionary = parsedResult["photos"] as? NSDictionary else {
+                    let error = NSError(domain: "Cannot find keys 'photos'", code: 0, userInfo: nil)
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.alertViewForError(error)
+                    }
+                    return
+                }
+                
+                guard let totalPhotosVal = (photosDictionary["total"] as? NSString)?.integerValue else {
+                    let error = NSError(domain: "Cannot find key 'total'", code: 0, userInfo: nil)
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.alertViewForError(error)
+                    }
+                    return
+                }
+                
+                guard let photos = photosDictionary["photo"] as? [[String: AnyObject]] else {
+                    let error = NSError(domain: "Cannot find key 'photo'", code: 0, userInfo: nil)
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.alertViewForError(error)
+                    }
+                    return
+                }
+                
+                if totalPhotosVal > 0 {
+                    
+                    _ = photos.map() { (dictionary: [String : AnyObject]) -> Photo in
+                        let dic: [String : AnyObject] = [
+                            "path": dictionary["url_m"]!,
+                            "id": dictionary["id"]!
+                        ]
+                        let photo = Photo(dictionary: dic, context: self.sharedContext)
+                        
+                        Flickr.sharedInstance().taskForImage(photo.path) { data, error in
+                            
+                            if let error = error {
+                                dispatch_async(dispatch_get_main_queue()) {
+                                    self.alertViewForError(error)
+                                }
+                            }
+                            
+                            if let data = data {
+                                let image = UIImage(data: data)
+                                photo.photo = image
+                            }
+                        }
+                        
+                        photo.pin = pin
+                        
+                        return photo
+                    }
+                    
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.saveContext()
+                    }
+                    
+                }
+                
+            }
+            
+        })
+
+    }
+    
+    func alertViewForError(error: NSError) {
+        let alert = UIAlertController(title: "Alert", message: error.localizedDescription, preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "Click", style: UIAlertActionStyle.Default, handler: nil))
+        self.presentViewController(alert, animated: true, completion: nil)
     }
     
     var sharedContext: NSManagedObjectContext {
         return CoreDataStackManager.sharedInstance().managedObjectContext
+    }
+    
+    func saveContext() {
+        CoreDataStackManager.sharedInstance().saveContext()
     }
     
     func fetchAllPins() -> [Pin] {
@@ -120,9 +216,7 @@ class MapViewController: UIViewController {
             annotations.append(annotation)
         }
         
-        dispatch_async(dispatch_get_main_queue(), {
-            self.mapView.addAnnotations(annotations)
-        })
+        self.mapView.addAnnotations(annotations)
     }
 
 

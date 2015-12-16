@@ -39,30 +39,40 @@ class PhotoViewController: UIViewController {
         Flickr.sharedInstance().getPhotoUrls(pin.latitude as Double, longitude: pin.longitude as Double, completionHandler: { (parsedResult, error) -> Void in
             
             if let error = error {
-                self.alertViewForError(error)
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.alertViewForError(error)
+                }
             } else {
                 
                 guard let stat = parsedResult["stat"] as? String where stat == "ok" else {
                     let error = NSError(domain: "Flickr API returned an error. See error code and message in \(parsedResult)", code: 0, userInfo: nil)
-                    self.alertViewForError(error)
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.alertViewForError(error)
+                    }
                     return
                 }
                 
                 guard let photosDictionary = parsedResult["photos"] as? NSDictionary else {
                     let error = NSError(domain: "Cannot find keys 'photos' in \(parsedResult)", code: 0, userInfo: nil)
-                    self.alertViewForError(error)
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.alertViewForError(error)
+                    }
                     return
                 }
                 
                 guard let totalPhotosVal = (photosDictionary["total"] as? NSString)?.integerValue else {
                     let error = NSError(domain: "Cannot find key 'total' in \(photosDictionary)", code: 0, userInfo: nil)
-                    self.alertViewForError(error)
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.alertViewForError(error)
+                    }
                     return
                 }
                 
                 guard let photos = photosDictionary["photo"] as? [[String: AnyObject]] else {
                     let error = NSError(domain: "Cannot find key 'photo' in \(photosDictionary)", code: 0, userInfo: nil)
-                    self.alertViewForError(error)
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.alertViewForError(error)
+                    }
                     return
                 }
                                 
@@ -84,9 +94,8 @@ class PhotoViewController: UIViewController {
                     
                     dispatch_async(dispatch_get_main_queue()) {
                         self.collectionView.reloadData()
+                        self.saveContext()
                     }
-                    
-                    self.saveContext()
                     
                 } else {
                     dispatch_async(dispatch_get_main_queue()) {
