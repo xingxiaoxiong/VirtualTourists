@@ -29,7 +29,6 @@ class Photo : NSManagedObject {
         super.init(entity: entity,insertIntoManagedObjectContext: context)
         
         path = dictionary[Keys.Path] as! String
-        print("id: \(dictionary[Keys.Id])")
         id = dictionary[Keys.Id]! as! String
     }
     

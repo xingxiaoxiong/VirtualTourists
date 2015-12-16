@@ -14,6 +14,7 @@ class PhotoViewController: UIViewController {
     
     var pin: Pin!
     var downloadingCount = 0
+    var photoCount = 0
 
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var collectionView: UICollectionView!
@@ -27,6 +28,8 @@ class PhotoViewController: UIViewController {
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
+        
+        photoCount = pin.photos.count
         
         if pin.photos.isEmpty {
             downloadPhotos()
@@ -67,9 +70,7 @@ class PhotoViewController: UIViewController {
                 }
                                 
                 self.downloadingCount = photos.count
-                dispatch_async(dispatch_get_main_queue()) {
-                    self.collectionView.reloadData()
-                }
+                self.photoCount = photos.count
                 
                 if totalPhotosVal > 0 {
                     
@@ -177,44 +178,50 @@ extension PhotoViewController: UICollectionViewDelegate, UICollectionViewDataSou
     }
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.pin.photos.count
+        //return self.pin.photos.count
+        return self.photoCount
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         
         let photo = pin.photos[indexPath.row]
-        let CellIdentifier = "PhotoCell"
         var photoImage = UIImage(named: "photoPlaceHolder")
         
+        if photoImage == nil {
+            print("image nil")
+        }
+        
+        let CellIdentifier = "PhotoCell"
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(CellIdentifier, forIndexPath: indexPath) as! PhotoCell
         cell.photo.image = nil
         
-        if photo.path == "" {
-            photoImage = UIImage(named: "noPhoto")
-        } else if photo.photo != nil {
+        if photo.photo != nil {
             photoImage = photo.photo
         } else {
             
-            let task = Flickr.sharedInstance().taskForImage(photo.path) { data, error in
-                
-                if let error = error {
-                    self.alertViewForError(error)
-                }
-                
-                if let data = data {
-                    let image = UIImage(data: data)
+            //dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
+                let task = Flickr.sharedInstance().taskForImage(photo.path) { data, error in
                     
-                    photo.photo = image
+                    if let error = error {
+                        self.alertViewForError(error)
+                    }
                     
-                    dispatch_async(dispatch_get_main_queue()) {
-                        cell.photo.image = image
-                        self.downloadingCount--
-                        if self.downloadingCount == 0 {
-                            self.newCollectionButton.enabled = true
+                    if let data = data {
+                        let image = UIImage(data: data)
+                        
+                        photo.photo = image
+                        
+                        dispatch_async(dispatch_get_main_queue()) {
+                            cell.photo.image = image
+                            self.downloadingCount--
+                            if self.downloadingCount == 0 {
+                                self.newCollectionButton.enabled = true
+                            }
                         }
                     }
                 }
-            }
+                cell.taskToCancelifCellIsReused = task
+            //}
             
         }
         
@@ -229,6 +236,7 @@ extension PhotoViewController: UICollectionViewDelegate, UICollectionViewDataSou
         photo.photo = nil
         sharedContext.deleteObject(photo)
         CoreDataStackManager.sharedInstance().saveContext()
+        self.photoCount = pin.photos.count
         self.collectionView.reloadData()
     }
 

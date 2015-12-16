@@ -34,8 +34,6 @@ class Flickr : NSObject {
         let url = NSURL(string: urlString)!
         let request = NSURLRequest(URL: url)
         
-        print(url)
-        
         let task = session.dataTaskWithRequest(request) {data, response, downloadError in
             
             guard (downloadError == nil) else {
@@ -76,9 +74,7 @@ class Flickr : NSObject {
     // MARK: - All purpose task method for images
     
     func taskForImage(filePath: String, completionHandler: (imageData: NSData?, error: NSError?) ->  Void) -> NSURLSessionTask {
-        
-        print("downloading photos")
-        
+                
         let url = NSURL(string: filePath)!
         
         let request = NSURLRequest(URL: url)
