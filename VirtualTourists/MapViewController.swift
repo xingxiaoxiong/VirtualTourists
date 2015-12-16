@@ -135,31 +135,33 @@ class MapViewController: UIViewController {
                 if totalPhotosVal > 0 {
                     
                     dispatch_async(dispatch_get_main_queue()) {
-                    _ = photos.map() { (dictionary: [String : AnyObject]) -> Photo in
-                        let dic: [String : AnyObject] = [
-                            "path": dictionary["url_m"]!,
-                            "id": dictionary["id"]!
-                        ]
-                        let photo = Photo(dictionary: dic, context: self.sharedContext)
-                        
-                        Flickr.sharedInstance().taskForImage(photo.path) { data, error in
+                        _ = photos.map() { (dictionary: [String : AnyObject]) -> Photo in
+                            let dic: [String : AnyObject] = [
+                                "path": dictionary["url_m"]!,
+                                "id": dictionary["id"]!
+                            ]
+                            let photo = Photo(dictionary: dic, context: self.sharedContext)
                             
-                            if let error = error {
-                                dispatch_async(dispatch_get_main_queue()) {
-                                    self.alertViewForError(error)
+                            Flickr.sharedInstance().taskForImage(photo.path) { data, error in
+                                
+                                if let error = error {
+                                    dispatch_async(dispatch_get_main_queue()) {
+                                        self.alertViewForError(error)
+                                    }
+                                }
+                                
+                                if let data = data {
+                                    let image = UIImage(data: data)
+                                    dispatch_async(dispatch_get_main_queue()) {
+                                        photo.photo = image
+                                    }
                                 }
                             }
                             
-                            if let data = data {
-                                let image = UIImage(data: data)
-                                photo.photo = image
-                            }
+                            photo.pin = pin
+                            
+                            return photo
                         }
-                        
-                        photo.pin = pin
-                        
-                        return photo
-                    }
                     }
                     
                     dispatch_async(dispatch_get_main_queue()) {
