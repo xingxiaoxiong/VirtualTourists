@@ -13,8 +13,10 @@ class Photo : NSManagedObject {
     
     struct Keys {
         static let Path = "path"
+        static let Id = "id"
     }
     
+    @NSManaged var id: String
     @NSManaged var path: String
     @NSManaged var pin: Pin?
     
@@ -27,16 +29,18 @@ class Photo : NSManagedObject {
         super.init(entity: entity,insertIntoManagedObjectContext: context)
         
         path = dictionary[Keys.Path] as! String
+        print("id: \(dictionary[Keys.Id])")
+        id = dictionary[Keys.Id]! as! String
     }
     
     var photo: UIImage? {
         
         get {
-            return Flickr.Caches.imageCache.imageWithIdentifier(path)
+            return Flickr.Caches.imageCache.imageWithIdentifier(id)
         }
         
         set {
-            Flickr.Caches.imageCache.storeImage(newValue, withIdentifier: path)
+            Flickr.Caches.imageCache.storeImage(newValue, withIdentifier: id)
         }
     }
 }

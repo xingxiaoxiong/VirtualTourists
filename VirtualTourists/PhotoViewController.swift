@@ -65,15 +65,19 @@ class PhotoViewController: UIViewController {
                     self.alertViewForError(error)
                     return
                 }
-                
-                print(photos)
-                
+                                
                 self.downloadingCount = photos.count
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.collectionView.reloadData()
+                }
                 
                 if totalPhotosVal > 0 {
                     
                     _ = photos.map() { (dictionary: [String : AnyObject]) -> Photo in
-                        let dic: [String : AnyObject] = ["path": dictionary["url_m"]!]
+                        let dic: [String : AnyObject] = [
+                            "path": dictionary["url_m"]!,
+                            "id": dictionary["id"]!
+                        ]
                         let photo = Photo(dictionary: dic, context: self.sharedContext)
                         
                         photo.pin = self.pin
