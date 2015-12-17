@@ -28,20 +28,12 @@ class PhotoViewController: UIViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        downloadingCount = pin.photos.count
-        for photo in pin.photos {
-            if photo.photo != nil {
-                downloadingCount--
-            }
-        }
-        
-        if downloadingCount > 0 || pin.photos.count == 0{
+        if pin.photos.count == 0{
             downloadPhotos()
         }
     }
     
     func downloadPhotos() {
-        newCollectionButton.enabled = false
         
         Flickr.sharedInstance().getPhotoUrls(pin.latitude as Double, longitude: pin.longitude as Double, completionHandler: { (parsedResult, error) -> Void in
             
@@ -82,8 +74,6 @@ class PhotoViewController: UIViewController {
                     }
                     return
                 }
-                                
-                self.downloadingCount = photos.count
                 
                 if totalPhotosVal > 0 {
                     
@@ -96,10 +86,6 @@ class PhotoViewController: UIViewController {
                             ]
                             
                             let photo = Photo(dictionary: dic, context: self.sharedContext)
-                            
-                            if photo.photo != nil {
-                                self.downloadingCount--
-                            }
                             
                             photo.pin = self.pin
                             
@@ -115,6 +101,7 @@ class PhotoViewController: UIViewController {
                 } else {
                     dispatch_async(dispatch_get_main_queue()) {
                         self.newCollectionButton.setTitle("No Images", forState: UIControlState.Normal)
+                        self.newCollectionButton.enabled = false
                     }
                     
                 }
@@ -213,6 +200,10 @@ extension PhotoViewController: UICollectionViewDelegate, UICollectionViewDataSou
             photoImage = photo.photo
         } else {
             
+            dispatch_async(dispatch_get_main_queue()) {
+                self.newCollectionButton.enabled = false
+            }
+            
             //dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
                 let task = Flickr.sharedInstance().taskForImage(photo.path) { data, error in
                     
@@ -245,6 +236,13 @@ extension PhotoViewController: UICollectionViewDelegate, UICollectionViewDataSou
         
         return cell
 
+    }
+    
+    func collectionView(collectionView: UICollectionView, willDisplayCell cell: UICollectionViewCell, forItemAtIndexPath indexPath: NSIndexPath) {
+        let photo = pin.photos[indexPath.row]
+        if photo.photo == nil {
+            self.downloadingCount++
+        }
     }
     
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
