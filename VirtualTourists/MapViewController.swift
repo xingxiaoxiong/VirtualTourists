@@ -18,6 +18,8 @@ class MapViewController: UIViewController {
     
     var pins = [Pin]()
     
+    var currentPin: Pin!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -72,20 +74,22 @@ class MapViewController: UIViewController {
         if gestureRecognizer.state == UIGestureRecognizerState.Began {
             let touchPoint = gestureRecognizer.locationInView(mapView)
             let newCoordinates = mapView.convertPoint(touchPoint, toCoordinateFromView: mapView)
-            let annotation = MKPointAnnotation()
-            annotation.coordinate = newCoordinates
-            mapView.addAnnotation(annotation)
-            
+
             let dictionary: [String : AnyObject] = [
                 Pin.Keys.Latitude : newCoordinates.latitude,
                 Pin.Keys.Longitude : newCoordinates.longitude,
             ]
-            let pinToBeAdded = Pin(dictionary: dictionary, context: sharedContext)
-            self.pins.append(pinToBeAdded)
+            currentPin = Pin(dictionary: dictionary, context: sharedContext)
+            self.pins.append(currentPin)
+            
+            currentPin.title = ""
+            mapView.addAnnotation(currentPin)
             
             CoreDataStackManager.sharedInstance().saveContext()
             
-            //self.downloadPhotos(newCoordinates.latitude, longitude: newCoordinates.longitude, pin: pinToBeAdded)
+            //print("coordinates: \(newCoordinates.latitude) , \(newCoordinates.longitude)")
+            
+            //self.downloadPhotos(newCoordinates.latitude, longitude: newCoordinates.longitude, pin: currentPin)
             
         }
     }
@@ -229,22 +233,63 @@ class MapViewController: UIViewController {
 
 extension MapViewController : MKMapViewDelegate {
     
+    func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
+        let reuseId = "pin"
+        
+        var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseId) as? MKPinAnnotationView
+        
+        if pinView == nil {
+            pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+            pinView!.canShowCallout = false
+            pinView!.pinTintColor = UIColor.redColor()
+            pinView!.draggable = true
+        }
+        else {
+            pinView!.annotation = annotation
+        }
+        
+        return pinView
+    }
+    
+    func mapView(mapView: MKMapView, annotationView view: MKAnnotationView, didChangeDragState newState: MKAnnotationViewDragState, fromOldState oldState: MKAnnotationViewDragState) {
+        switch (newState) {
+        case .Starting:
+            for pin in pins {
+                if view.annotation?.coordinate.longitude == pin.longitude && view.annotation?.coordinate.latitude == pin.latitude {
+                    currentPin = pin
+                    break
+                }
+            }
+        case .Ending, .Canceling:
+            let newCoordinates = mapView.convertPoint(view.center, toCoordinateFromView: mapView)
+            currentPin.coordinate = newCoordinates
+            for photo in currentPin.photos {
+                photo.photo = nil
+                sharedContext.deleteObject(photo)
+                CoreDataStackManager.sharedInstance().saveContext()
+            }
+        default: break
+        }
+    }
+    
     func mapView(mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         saveMapRegion()
     }
     
     func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
-        let controller =
-        storyboard!.instantiateViewControllerWithIdentifier("PhotoViewController")
-            as! PhotoViewController
-        
-        for pin in pins {
-            if view.annotation?.coordinate.longitude == pin.longitude && view.annotation?.coordinate.latitude == pin.latitude {
-                controller.pin = pin
-                break
+        if view.dragState == .None {
+            let controller =
+            storyboard!.instantiateViewControllerWithIdentifier("PhotoViewController")
+                as! PhotoViewController
+            
+            for pin in pins {
+                if view.annotation?.coordinate.longitude == pin.longitude && view.annotation?.coordinate.latitude == pin.latitude {
+                    controller.pin = pin
+                    break
+                }
             }
+            
+            self.navigationController!.pushViewController(controller, animated: true)
         }
-        
-        self.navigationController!.pushViewController(controller, animated: true)
     }
 }

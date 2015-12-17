@@ -205,7 +205,7 @@ extension PhotoViewController: UICollectionViewDelegate, UICollectionViewDataSou
             }
             
             //dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0)) {
-                let task = Flickr.sharedInstance().taskForImage(photo.path) { data, error in
+                Flickr.sharedInstance().taskForImage(photo.path) { data, error in
                     
                     if let error = error {
                         dispatch_async(dispatch_get_main_queue()) {
