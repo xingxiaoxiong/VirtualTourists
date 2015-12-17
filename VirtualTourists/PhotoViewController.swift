@@ -187,10 +187,7 @@ extension PhotoViewController: UICollectionViewDelegate, UICollectionViewDataSou
         
         let photo = pin.photos[indexPath.row]
         var photoImage = UIImage(named: "photoPlaceHolder")
-        
-        if photoImage == nil {
-            print("image nil")
-        }
+
         
         let CellIdentifier = "PhotoCell"
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier(CellIdentifier, forIndexPath: indexPath) as! PhotoCell
@@ -220,7 +217,7 @@ extension PhotoViewController: UICollectionViewDelegate, UICollectionViewDataSou
                             photo.photo = image
                             cell.photo.image = image
                             self.downloadingCount--
-                            print(self.downloadingCount)
+                            //print(self.downloadingCount)
                             if self.downloadingCount == 0 {
                                 self.newCollectionButton.enabled = true
                             }
